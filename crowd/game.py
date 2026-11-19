@@ -663,3 +663,50 @@ def benchmarks(game: SlotGame, seed: int = 0, n_random: int = 2, eps_margin: flo
     worst = max(accepted, key=lambda s: s.social_cost)
     best = min(accepted, key=lambda s: s.social_cost)
     return Benchmarks(game, worst, best, opt, accepted)
+
+
+# ============================================================================
+# Robustness: what if arrivals inside a slot are random rather than evenly spread?
+#
+# The fluid queue spreads each slot's arrivals evenly, so a schedule that feeds the
+# bottleneck at exactly its rate has no queue at all. Real arrivals bunch up. Here we
+# keep the slot counts A[t] of a schedule but draw each person's arrival time
+# uniformly inside their slot, serve them first come first served by one server at
+# rate mu (fixed or exponential service times) and measure the waiting by simulation
+# (Lindley's recursion). Schedules are still the fluid ones; only their cost changes.
+# ============================================================================
+def random_arrival_wait(model: FluidQueue, A: np.ndarray, reps: int = 200, seed: int = 0,
+                        service: str = "fixed") -> np.ndarray:
+    """Mean wait (minutes) of the people arriving in each slot, with random arrival times."""
+    A = np.asarray(A, dtype=int)
+    T, dt, mu = len(A), model.slot_minutes, model.service_rate
+    slot_of = np.repeat(np.arange(T), A)
+    N = len(slot_of)
+    if N == 0:
+        return np.zeros(T)
+    rng = np.random.default_rng(seed)
+    arr = np.sort(slot_of[None, :] * dt + rng.random((reps, N)) * dt, axis=1)  # stays grouped by slot
+    if service == "fixed":
+        s = np.full((reps, N), 1.0 / mu)
+    elif service == "exponential":
+        s = rng.exponential(1.0 / mu, size=(reps, N))
+    else:
+        raise ValueError("service must be 'fixed' or 'exponential'")
+    wait = np.empty((reps, N))
+    free = np.zeros(reps)  # time the server becomes free
+    for i in range(N):
+        start = np.maximum(arr[:, i], free)
+        wait[:, i] = start - arr[:, i]
+        free = start + s[:, i]
+    per_slot = np.zeros(T)
+    np.add.at(per_slot, slot_of, wait.mean(axis=0))
+    return np.divide(per_slot, A, out=np.zeros(T), where=A > 0)
+
+
+def random_arrival_cost(game: SlotGame, X: np.ndarray, reps: int = 200, seed: int = 0,
+                        service: str = "fixed") -> float:
+    """Social cost of schedule X when arrivals are random inside each slot (waiting + inconvenience)."""
+    X = np.asarray(X)
+    A = game.loads(X).astype(int)
+    W = random_arrival_wait(game.congestion, A, reps, seed, service)
+    return float((A * W).sum() + (X * game.schedule_cost).sum())

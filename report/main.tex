@@ -14,6 +14,7 @@
 \usepackage{graphicx}       % graphics
 \usepackage{amsmath,amssymb,amsthm,xcolor,enumitem,caption,float,needspace,array,multirow}
 \usepackage{tikz}
+\input{generated/numbers}  % numbers quoted in the text, written by experiments.py
 \usetikzlibrary{positioning,arrows.meta,fit}
 \hypersetup{colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black}
 % figures: ../results/figures/ (made by experiments.py), photos: ../docs/img/ (credits in Fig. 1)
@@ -94,18 +95,18 @@ Araceli Alarcon (public domain).}\label{fig:photos}
 
 \begin{abstract}
 \noindent Many people share one bottleneck and each chooses \emph{when} to use it: cars at a bridge, backups on a
-network link, diners at a food court, members at a gym, students at a hostel mess. We model this as a game in which
-people pick a time slot, a queue serves them first come first served, and each person pays their waiting time plus
-the inconvenience of not going at their favourite time. Two ideas carry the whole project. The \emph{Nash
-equilibrium} is where selfish timing settles; in five facilities it costs 3.3--8.0 times the planner's schedule. The
-\emph{correlated equilibrium} is advice that people want to follow: an app privately tells each person a slot. A
-public crowd display that everyone reacts to multiplies the cost up to 17 times (herding). Private advice drawn from a
-Nash schedule is always obeyed, removes herding and works for every kind of crowd. We prove, and verify by linear
-programming, that in a large crowd with complete information no correlated equilibrium beats Nash; but the obedience
-constraints price the smallest reward that makes the planner's schedule self-enforcing, and with it nobody is worse
-off than under selfish timing. When the operator knows more than the crowd (a bad day), \emph{what} is said matters
-more than saying it privately: announcing a road accident raises the expected cost by 20\%, while a vague hint lowers
-it. Finally we apply everything to the four messes of IIT Gandhinagar, using 393,747 synthetic QR scans.
+network link, diners at a food court, members at a gym, students at a hostel mess. We model this as a game of time
+slots and a first-come-first-served queue. Selfish timing (the \emph{Nash equilibrium}) costs 3.3--8.0 times the
+planner's schedule in five facilities (\PoaRandom{} times if arrivals inside a slot are random), and a public crowd display
+that everyone reacts to multiplies the cost up to 17 times. Our main tool is the \emph{correlated equilibrium} (CE):
+advice that people want to follow. Solving small crowds exactly, we show that the best CE beats every pure Nash
+equilibrium (closing \EightBestGap{} of the gap to the planner at 10 people) and that the advantage fades as the crowd grows,
+as our Proposition~2 predicts. Private advice drawn from a Nash schedule is obeyed by rational users and ends herding,
+but noisy users drift away from it, because a Nash schedule leaves them nearly indifferent. The CE obedience
+constraints price the smallest reward that makes the planner's schedule self-enforcing; a margin of 1--2 minutes
+makes it hold for noisy users too. On bad days, \emph{what} is said matters most: announcing backfires on severe ones
+in \BackfireClear{} of the five facilities (and barely in one more), while a calibrated hint never does worse; privacy
+adds up to \PrivSmallMax{} in small crowds but little in large ones. We apply all of this to the four messes of IIT Gandhinagar (393,747 synthetic QR scans).
 \end{abstract}
 
 \keywords{Crowd congestion \and Nash equilibrium \and Correlated equilibrium \and Information design \and Price of anarchy}
@@ -134,14 +135,14 @@ Figure~\ref{fig:story} is the map of the report.
 
 \begin{figure}[t]\centering
 \begin{tikzpicture}[
-  box/.style={draw=#1!80!black, fill=#1!8, rounded corners=3pt, line width=0.8pt, text width=2.6cm, minimum height=3.25cm,
+  box/.style={draw=#1!80!black, fill=#1!8, rounded corners=3pt, line width=0.8pt, text width=2.6cm, minimum height=3.6cm,
               align=center, inner sep=4pt, font=\footnotesize, execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
   arr/.style={-{Stealth[length=2.2mm]}, line width=0.8pt, cMUT}]
-\node[box=cMUT] (a) {{\small\bfseries 1.\ Selfish timing}\\[3pt] everyone picks their best slot: a \textbf{Nash equilibrium}\\[3pt] {\color{cNE}\textbf{3.3--8.0$\times$}} the planner's cost\\[1pt]{\scriptsize (Sec.~\ref{sec:selfish})}};
+\node[box=cMUT] (a) {{\small\bfseries 1.\ Selfish timing}\\[3pt] everyone picks their best slot: a \textbf{Nash equilibrium}\\[3pt] {\color{cNE}\textbf{3.3--8.0$\times$}} the planner's cost ({\PoaRandom$\times$} with random arrivals)\\[1pt]{\scriptsize (Sec.~\ref{sec:selfish})}};
 \node[box=cNE, right=0.3cm of a] (b) {{\small\bfseries 2.\ Public display}\\[3pt] everyone reacts to the same numbers\\[3pt] {\color{cNE}\textbf{up to 17$\times$}} Nash: herding\\[1pt]{\scriptsize (Sec.~\ref{sec:display})}};
-\node[box=cCE, right=0.3cm of b] (c) {{\small\bfseries 3.\ Private advice}\\[3pt] a \textbf{correlated equilibrium}: nobody wants to disobey\\[3pt] {\color{cCE}\textbf{= Nash}}, but stable\\[1pt]{\scriptsize (Sec.~\ref{sec:ce})}};
-\node[box=cOPT, right=0.3cm of c] (d) {{\small\bfseries 4.\ Add a reward}\\[3pt] the smallest reward that makes the optimum obeyed\\[3pt] {\color{cOPT}\textbf{optimum}}, nobody worse off\\[1pt]{\scriptsize (Sec.~\ref{sec:reward})}};
-\node[box=cGOLD, right=0.3cm of d] (e) {{\small\bfseries 5.\ Bad days}\\[3pt] the operator knows more than the crowd\\[3pt] {\color{cGOLD!75!black}\textbf{a vague hint}} can beat announcing\\[1pt]{\scriptsize (Sec.~\ref{sec:bad})}};
+\node[box=cCE, right=0.3cm of b] (c) {{\small\bfseries 3.\ Private advice}\\[3pt] a \textbf{correlated equilibrium}: beats Nash in {\color{cCE}\textbf{small crowds}}, = Nash in large ones\\[1pt]{\scriptsize (Sec.~\ref{sec:ce})}};
+\node[box=cOPT, right=0.3cm of c] (d) {{\small\bfseries 4.\ Add a reward}\\[3pt] the smallest reward that makes the optimum obeyed\\[3pt] {\color{cOPT}\textbf{optimum}}, nobody worse off; noisy users need a margin\\[1pt]{\scriptsize (Sec.~\ref{sec:reward})}};
+\node[box=cGOLD, right=0.3cm of d] (e) {{\small\bfseries 5.\ Bad days}\\[3pt] the operator knows more than the crowd\\[3pt] {\color{cGOLD!75!black}\textbf{a calibrated hint}} beats announcing\\[1pt]{\scriptsize (Sec.~\ref{sec:bad})}};
 \foreach \u/\v in {a/b,b/c,c/d,d/e} \draw[arr] (\u) -- (\v);
 \node[draw=cMUT!70, dashed, rounded corners=3pt, fit=(a)(e), inner sep=5pt,
       label={[font=\small\itshape, text=cMUT]above:crowd congestion in general: road, network, food court, gym, mess}] (g) {};
@@ -153,11 +154,13 @@ Figure~\ref{fig:story} is the map of the report.
 
 \textbf{What we did.} (1)~One model and one set of solvers (Nash, optimum, large crowd, price of anarchy) for five
 facilities (Sections~\ref{sec:model}--\ref{sec:selfish}). (2)~A day-to-day simulator of displays and crowds
-(Section~\ref{sec:display}). (3)~Correlated advice end to end: when correlation beats Nash, a recommender obeyed by
-construction, a proof and a linear-programming check that advice alone cannot beat Nash in a large crowd, how many
-users it needs, the smallest reward that reaches the optimum, and whether learners find a correlated equilibrium
-themselves (Section~\ref{sec:ce}). (4)~Who should be told what on bad days (Section~\ref{sec:bad}). (5)~The mess case
-study (Section~\ref{sec:mess}). (6)~A tested library, a website and an interactive lab (Section~\ref{sec:built}).
+(Section~\ref{sec:display}). (3)~Correlated advice end to end: exact small crowds that show when correlation beats Nash and how
+the advantage fades, a proof that advice alone cannot beat Nash in a large crowd, a shuffled recommender, what happens
+when its users are noisy, how many users it needs, the smallest reward that reaches the optimum, and whether learners
+find a correlated equilibrium themselves (Section~\ref{sec:ce}). (4)~Who should be told what on bad days, including how
+bad and how frequent they are (Section~\ref{sec:bad}). (5)~Robustness of the headline numbers to random arrivals
+(Sections~\ref{sec:selfish} and~\ref{sec:bad}). (6)~The mess case study (Section~\ref{sec:mess}). (7)~A list of claims with their evidence and verification checks (Sections~\ref{sec:built}--\ref{sec:claims}). (8)~A tested library,
+a website and an interactive lab (Section~\ref{sec:built}).
 
 % ============================================================================
 \section{The model: one game for every shared facility}\label{sec:model}
@@ -203,15 +206,17 @@ equilibrium is a CE ($p$ puts all its weight on it). The conditions are linear i
 program.
 
 \begin{table}[t]\centering\small
-\caption{Five shared facilities, one model. Selfish = the worst Nash equilibrium found; planner = the optimum. Minutes
-per person per visit. The last column is the ``bad day'' of Section~\ref{sec:bad}.}\label{tab:domains}
-\begin{tabular}{@{}lrrrrrrl@{}}\toprule
-Facility & People & Slot & $\mu$/min & Selfish & Planner & PoA & Bad day (70\% capacity)\\\midrule
-Road: commute over a bridge & 2400 cars & 15\,min & 15 & 17.12 & 4.50 & 3.8 & an accident closes a lane\\
-Network: night backups & 600 jobs & 10\,min & 7 & 3.71 & 1.13 & 3.3 & the link runs degraded\\
-Food court: lunch & 450 diners & 10\,min & 6 & 2.35 & 0.50 & 4.7 & one counter is closed\\
-Gym: after work & 240 members & 20\,min & 1.5 & 1.68 & 0.31 & 5.4 & machines out of order\\
-Mess: dinner (generic) & 680 students & 10\,min & 9 & 2.21 & 0.28 & 8.0 & the counter is short of staff\\\bottomrule
+\caption{Five shared facilities, one model. Selfish = the \emph{worst} Nash equilibrium found (the one in the price of
+anarchy); planner = the optimum. Minutes per person per visit. PoA, random: the same two schedules when arrival times
+inside each slot are random (Section~\ref{sec:selfish}). The last column is the ``bad day'' of Section~\ref{sec:bad}.}\label{tab:domains}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrrrl@{}}\toprule
+Facility & People & Slot & $\mu$/min & Selfish & Planner & PoA & PoA, random & Bad day (70\% capacity)\\\midrule
+Road: bridge commute & 2400 cars & 15\,min & 15 & 17.12 & 4.50 & 3.8 & 3.2 & a lane closed\\
+Network: night backups & 600 jobs & 10\,min & 7 & 3.71 & 1.13 & 3.3 & 1.8 & link degraded\\
+Food court: lunch & 450 diners & 10\,min & 6 & 2.35 & 0.50 & 4.7 & 2.2 & a counter closed\\
+Gym: after work & 240 members & 20\,min & 1.5 & 1.68 & 0.31 & 5.4 & 1.3 & machines down\\
+Mess: dinner (generic) & 680 students & 10\,min & 9 & 2.21 & 0.28 & 8.0 & 2.8 & staff short\\\bottomrule
 \end{tabular}
 \end{table}
 
@@ -225,6 +230,13 @@ away from their favourite time. The reason is the externality: a car that joins 
 behind it, but its driver counts only their own wait. The bumpy Nash profile in Fig.~\ref{fig:selfish} is real, not
 noise: the slot right after a rush inherits its queue, so arriving at the start of a rush is better than just after it.
 
+\textbf{How much of this is the fluid queue?} The planner's zero wait comes from spreading arrivals perfectly evenly
+inside each slot. Real arrivals bunch up. We therefore keep the two schedules but draw every arrival time at random
+inside its slot, serve people one at a time at rate $\mu$ and measure the waiting by simulation (200 runs). The
+planner now waits too, and the price of anarchy falls to \PoaRandom{} (\PoaRandomExp{} if service times are also random;
+Table~\ref{tab:domains}, Fig.~\ref{fig:robust} left). Selfish timing still costs \LostRoad{} minutes per car and \LostMess{} per student. The ratios in the rest of the report use the fluid model and should be read as upper
+bounds; the minutes lost and the comparisons between policies are what matter.
+
 \begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig2_selfish_vs_planner.png}
 \caption{Left: minutes lost per person under selfish timing and under the planner (labels: price of anarchy). Right:
 the morning commute. Selfish drivers (orange) overload the bridge around 8:30; the planner (green) feeds it at
@@ -233,7 +245,10 @@ capacity.}\label{fig:selfish}\end{figure}
 % ============================================================================
 \section{Step 2: a public display can make things worse}\label{sec:display}
 \textbf{Simulator.} The same people choose a slot every day for 150 days (the first 50 are discarded; 30 random seeds;
-95\% confidence intervals are within 6\% of the mean). Each day some people reconsider. Such a person picks slot $t$
+95\% confidence intervals are within 6\% of the mean). Policies are compared on the same seeds, so differences are
+tested with two-sided paired sign-flip permutation tests and Holm's correction within each family of
+comparisons~\cite{holm}: \TestsSig{} of the \TestsAll{} comparisons behind Sections~\ref{sec:display}
+and~\ref{sec:reward} are significant at 5\% (largest adjusted $p$ = \TestsMaxP). Each day some people reconsider. Such a person picks slot $t$
 with probability proportional to $e^{-\lambda\,\hat c_i(t)}$, where $\hat c_i(t)$ is the cost they expect in $t$
 from what they are shown plus their inconvenience (logit choice~\cite{mckelvey}); everyone else keeps yesterday's
 slot. We use three crowds: \emph{calm} ($\lambda=3$, 30\% reconsider each day), \emph{reactive} ($\lambda=3$,
@@ -254,12 +269,13 @@ advice that differs between people, which is where the correlated equilibrium co
 
 \begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig3_public_display.png}
 \caption{Cost of each information policy relative to the Nash equilibrium (1 = Nash; log scale), for five facilities
-and three crowds. The public display (orange) is harmful for a reactive crowd; CE advice (blue) is exactly Nash in
-every case; only CE advice with a reward (green) gets close to the optimum.}\label{fig:display}\end{figure}
+and three crowds. The public display (orange) is harmful for a reactive crowd. Here app users are rational (they disobey only if it
+saves more than 6\,s), so CE advice (blue) is exactly Nash by construction; Section~\ref{sec:stable} lets them be as
+noisy as everyone else. Only CE advice with a reward (green) gets close to the optimum.}\label{fig:display}\end{figure}
 
 % ============================================================================
 \section{Step 3: correlated equilibrium, advice that people want to follow}\label{sec:ce}
-\subsection{In small games correlation beats every Nash equilibrium}\label{sec:small}
+\subsection{In small games correlation can beat every Nash equilibrium}\label{sec:small}
 \textbf{Two students, Peak or Late.} The popular slot (Peak) costs the number of students there (1 or 2); Late
 always costs 1.5. In a pure Nash equilibrium one student goes Peak and the other Late, which is optimal (total 2.5),
 but somebody has to volunteer for Late. Without coordination the symmetric equilibrium is mixed: each goes Peak with
@@ -267,12 +283,14 @@ probability $\nicefrac{1}{2}$, total 3.0. A shared counter that both react to ma
 Peak'' and ``both Late'', total 3.5: herding in miniature. A \emph{private fair coin} that tells one student Peak and
 the other Late is a correlated equilibrium: a student told Late knows the other was told Peak, so switching would cost
 2 instead of 1.5. It reaches the optimum (2.5) and is fair, since each student is told Peak half the time
-(Fig.~\ref{fig:small}, left).
+(Fig.~\ref{fig:small}, left). This coin only mixes the two pure Nash equilibria, so a public coin would do the same:
+it shows coordination, not something beyond Nash.
 
 \textbf{A traffic light.} Two drivers choose Stop or Go: both stop 6/6, one goes 7/2, both go 0/0 (a crash; here
 higher is better). The best CE, from the linear program~\eqref{eq:ce}, says ``both stop'' with probability
 $\nicefrac12$ and ``one goes'' with $\nicefrac14$ each. It never causes a crash and gives each driver 5.25, more than
-any symmetric Nash outcome (4.67).
+any symmetric Nash outcome (4.67). Here privacy matters: ``both stop'' is not a Nash equilibrium, and a driver told
+Stop obeys only because they do not know whether the other was told Stop or Go.
 
 \begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig1_small_games.png}
 \caption{Small games. Left: the two-student game under three kinds of information. Middle: the traffic light: the best
@@ -293,13 +311,60 @@ planner's optimum, used as advice, is \emph{not} a CE. The people it sends away 
 gain up to 2.9--18 minutes by going to the peak instead, and when they do, the cost rises \emph{above} Nash
 (1.3--4.8$\times$, pink bars in Fig.~\ref{fig:display}).
 
+\subsection{From two people to a crowd, solved exactly}\label{sec:exact}
+Between two drivers and 2400 cars exactness is usually lost: the CE linear program has one variable per profile, $3^n$
+of them for $n$ people and three slots. For identical people we do not need them. Relabelling identical people keeps a
+CE a CE at the same cost, so averaging any CE over all relabellings gives one of the form ``draw a schedule $X$, then
+shuffle'', and the linear program over all \emph{schedules} gives the exact best CE (we check it against the full
+program over all $3^6$ profiles). We take $n$ identical people, three 10-minute slots, everyone preferring the middle
+one ($\beta=2$), and a bottleneck that grows with the crowd (load 0.8), so that only the weight of one person changes
+with $n$. Every number in Fig.~\ref{fig:exact} (left) is exact.
+
+The best CE is strictly cheaper than every pure Nash equilibrium in \EightBetter{} of the \EightWith{} crowd sizes from 2 to 60 that
+have one. At 10 people it costs 1.56 minutes against 2.12 for the only pure Nash equilibrium (planner 1.20): it closes
+60\% of the gap. On 99\% of days it sends one more person to the late slot than the Nash equilibrium does (4/5/1
+instead of 4/6/0). That person would gain 4 seconds by returning to the peak, but cannot tell this day from the rare
+day (1\%) on which the advice is 8/0/2: then the peak inherits a long queue from the crowded early slot and returning
+would cost over 3 minutes. Weighted by how often each happens, obeying is a best response. This is exactly what a correlated equilibrium can do and a Nash equilibrium cannot. The advantage fades
+as one person's weight shrinks: at 51--60 people the best CE closes only \EightFade{} of the gap, which is
+Proposition~\ref{p2} below seen directly. At 7, 9 and 11 people there is no pure Nash equilibrium at all, while a CE
+always exists. Finally, a pure Nash equilibrium tells identical people who should go where, which they cannot agree on
+alone; without any coordination they play the symmetric mixed equilibrium, which costs 3.02 minutes at 10 people and is
+still \EightMixed{} times the best CE at 60. So even where advice cannot beat the best Nash equilibrium, it is what makes that
+equilibrium reachable.
+
+\textbf{Other crowds.} Table~\ref{tab:variants} repeats the exact analysis for \VarCount{} crowds of different shapes
+(\VarSizes{} sizes from 4 to 40 each). Three things hold in every one of them: a CE exists, it is never worse than
+the best pure Nash equilibrium, and it is far cheaper than uncoordinated play (by \VarMixedMin{} to \VarMixedMax{}
+where the mixed equilibrium can be computed). Pure Nash equilibria often do not exist at all: with four slots or at full
+load, at most sizes. Beating the \emph{best} pure Nash equilibrium happens in \VarBeat{} of the \VarCount{} crowds, but
+not at every size (for example at 3 of 9 sizes when people are rigid). The precise claim is therefore: correlation
+always beats uncoordinated play, often beats the best equilibrium, and never does worse.
+
+\begin{table}[t]\centering\small
+\caption{Small crowds of other shapes, solved exactly (crowd sizes 4, 6, 8, 10, 12, 16, 20, 30, 40). Pure Nash exists:
+sizes at which there is a pure Nash equilibrium. CE beats it: sizes at which the best CE is strictly cheaper than every
+pure Nash equilibrium. Largest saving: of the best CE over the best pure Nash. Versus mixed Nash: saving over the
+symmetric mixed equilibrium (one-type crowds only).}\label{tab:variants}
+\begin{tabular}{@{}lrrrr@{}}\toprule
+Crowd & pure Nash exists & CE beats it & largest saving & versus mixed Nash\\\midrule
+\csname @@input\endcsname generated/tab_variants.tex 
+\bottomrule\end{tabular}\end{table}
+
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig9_small_crowds.png}
+\caption{Small crowds solved exactly (identical people, three slots). Left: cost per person by crowd size; the best
+correlated equilibrium beats every pure Nash equilibrium and, by far, the uncoordinated mixed one, and the advantage over
+pure Nash fades as the crowd grows. Right (Section~\ref{sec:bad}): on bad days, what private advice saves over the best
+public hint; dashed lines are the same game in the large-crowd limit.}\label{fig:exact}\end{figure}
+
 \subsection{Can advice alone beat Nash in a large crowd?}\label{sec:beat}
-In the small games correlation won because one person's choice changes the others' costs a lot. In a crowd each person
+In small crowds correlation won because one person's choice changes the others' costs. In a large crowd each person
 is negligible.
 
 \begin{proposition}[Advice alone cannot beat Nash in a large crowd]\label{p2}
-In a large crowd with complete information and congestion costs that strictly increase with the load, every coarse correlated
-equilibrium, and hence every CE, has the loads and the cost of the Nash (Wardrop) equilibrium $x^*$.\end{proposition}
+In a large crowd with complete information, if each slot's congestion cost depends only on that slot's load and
+strictly increases with it, every coarse correlated equilibrium, and hence every CE, has the loads and the cost of the
+Nash (Wardrop) equilibrium $x^*$.\end{proposition}
 \noindent\emph{Proof sketch.} Compare each type's obedience with ``always go where $x^*$ sends you'' and add these
 conditions with weights $x^*$. This gives $\sum_s p(s)\,\langle x^s-x^*,c(x^s)\rangle\le 0$, where $x^s$ is the
 schedule of profile $s$ and $c(\cdot)$ the vector of costs. Each term splits into
@@ -307,15 +372,19 @@ $\langle x^s-x^*,\,c(x^s)-c(x^*)\rangle\ge0$ (costs increase with the load) plus
 ($x^*$ is an equilibrium), so both are zero, and strictly increasing costs force equal loads.\qed
 
 \smallskip
-Our queue carries over, so Proposition~\ref{p2} does not apply exactly. We therefore test it with the linear
-program~\eqref{eq:ce} over every randomisation of about 25 schedules, from the Nash schedule to the optimum.
-Table~\ref{tab:ce} shows the answer: in all five facilities the best CE costs exactly what Nash costs, both in the
-real (atomic) game, with the tolerance $\varepsilon$, and in the large-crowd game, exactly.
+Our queue carries over, so a slot's wait also depends on earlier slots and Proposition~\ref{p2} is \emph{not} a
+theorem for our model. We check it numerically with the linear program~\eqref{eq:ce} over every randomisation of about
+25 schedules (the Nash schedule, the optimum and schedules in between). Table~\ref{tab:ce} shows that in all five
+facilities this best CE costs what Nash costs, both in the real (atomic) game, with the tolerance $\varepsilon$, and in
+the large-crowd game. A menu cannot rule out a better CE elsewhere, so this supports the claim for our queue without
+proving it; Section~\ref{sec:exact} showed the same fading exactly, for every crowd small enough to list.
 
 \finding{Advice coordinates, but on its own it cannot ask anybody to take a worse slot for the common good.}
 
 \begin{table}[t]\centering\small
-\caption{Correlated advice in numbers. Left: the best correlated equilibrium found by the linear program equals Nash.
+\caption{Correlated advice in numbers. Nash = the \emph{best} Nash equilibrium found (Table~\ref{tab:domains} uses the
+worst; they differ most in the gym, 1.44 against 1.68, which has several equilibria). Left: the best correlated
+equilibrium found by the linear program equals Nash.
 Right (Proposition~\ref{p3}): who is tempted by the optimum, the reward that removes the temptation, the time it saves,
 and how many people end up worse off than under selfish timing. Minutes per person.}\label{tab:ce}
 \begin{tabular}{@{}l|rr|rr|rrrr@{}}\toprule
@@ -329,18 +398,40 @@ Mess & 2.16 & 2.16 & 2.16 & 2.16 & 11\% & 0.27 & 1.88 & 0 / 0\\\bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{What advice is good for: stability}\label{sec:stable}
-CE advice gives exactly the Nash cost for every kind of crowd in every facility (blue bars in Fig.~\ref{fig:display}),
-with nobody switching slots and a regret of at most 0.02 minutes: people obey because it is in their own interest,
-from the first day. It also protects the people who do not use it (Fig.~\ref{fig:ceplot}, left). With a reactive crowd
+\subsection{What advice is good for, and what happens when users are noisy}\label{sec:stable}
+With rational app users, who disobey only if it saves more than 6 seconds, CE advice gives exactly the Nash cost for
+every kind of crowd in every facility (blue bars in Fig.~\ref{fig:display}), with nobody switching slots: people obey
+because it is in their own interest, from the first day. This is by construction, since the advice is a CE up to the
+equilibrium's accuracy (at most 6\,s). The test is users who are as noisy as everyone else. Told slot $r$, such a user
+picks slot $t$ with probability proportional to $e^{-\lambda c(t)}$, where $c(t)$ is what $t$ would cost them if the
+others obey (the app can compute it), with $\lambda=3$ (as in the calm crowd) or $\lambda=1$ (the noisy crowd).
+Table~\ref{tab:noisy} shows the result. CE advice is then no longer exactly Nash: \CERange{} times Nash, better where
+random deviations happen to spread a rush and worse elsewhere. The reason is that a Nash schedule leaves people almost
+indifferent between their slot and the next one (that is what equilibrium means in a crowd), so the advice gives them
+only seconds of reason to obey. The reward of Proposition~\ref{p3} has the same knife edge, because it removes the
+temptation exactly; we return to it in Section~\ref{sec:reward}.
+
+\begin{table}[t]\centering\small
+\caption{App users as noisy as everyone else: cost relative to Nash (1 = Nash). $\lambda$: how sharply users prefer
+cheaper slots; margin: minutes of reward on top of Proposition~\ref{p3}'s, so that obeying is strictly better.
+Last column: the planner (the best possible). \NoisySeeds{} seeds $\times$ 50 days.}\label{tab:noisy}
+\begin{tabular}{@{}l|rr|rrr|rrr|r@{}}\toprule
+ & \multicolumn{2}{c|}{CE advice} & \multicolumn{3}{c|}{CE advice + reward, $\lambda=3$} & \multicolumn{3}{c|}{CE advice + reward, $\lambda=1$} & \\
+Facility & $\lambda=3$ & $\lambda=1$ & margin 0 & 1 & 2 & margin 0 & 1 & 2 & planner\\\midrule
+\csname @@input\endcsname generated/tab_noisy.tex 
+\bottomrule
+\end{tabular}
+\end{table}
+
+CE advice also protects the people who do not use it (Fig.~\ref{fig:ceplot}, left). With a reactive crowd
 and the public display for non-users, the cost falls from 3.7--17$\times$ Nash when nobody uses the app to within
 10\% of Nash once 50--90\% of people use it (50\% is enough at the mess).
 
 \subsection{The price of obedience: a reward that reaches the optimum}\label{sec:reward}
 \begin{proposition}[Price of obedience]\label{p3}
 For a schedule $X$ let $G[k,t]$ be the most that a type-$k$ person told $t$ could gain by moving alone (zero if
-nothing is gained). A reward of $G[k,t]$ for showing up in the recommended slot, for example a priority token, makes the
-shuffled $X$ a correlated equilibrium of the rewarded game, and no smaller reward per slot does. The total reward is
+nothing is gained). A reward worth $G[k,t]$ minutes to the recipient for showing up in the recommended slot (for example a coupon) makes
+the shuffled $X$ a correlated equilibrium of the rewarded game, and no smaller reward per slot does. The total reward is
 $\sum_{k,t}X[k,t]\,G[k,t]$.\end{proposition}
 \noindent\emph{Proof.} With the reward, staying costs at most what any move costs; with less, somebody still gains by
 moving.\qed
@@ -351,7 +442,12 @@ away from the peak (11--56\%). It averages 0.27--4.48 minutes per person and sav
 minute of reward saves 2.4--6.9 minutes of queueing. The reward is a transfer, not a loss, and with it nobody is worse
 off than under selfish timing. Without it, the optimum already helps almost everyone (only 267 drivers and 10 gym members
 would lose, by at most 3 minutes), yet it is not stable, because each person sent off-peak would gain even more by sneaking back. This
-is the social dilemma that the reward resolves.
+is the social dilemma that the reward resolves. The reward is a transfer from the operator, valued in minutes; turning it
+into rupees needs a value of time. It should be something like a coupon: a priority token would not work, because at
+the planner's schedule there is almost no queue to skip, and skipping a queue delays others. With noisy users
+(Table~\ref{tab:noisy}) the exact reward leaves the planner's schedule as fragile as Nash (\RwThreeMzero{} times Nash at
+$\lambda=3$). A margin of 2 minutes on top restores it (\RwThreeMtwo, against \OptRange{} for the planner), at a cost of 2 minutes per
+person; very noisy users ($\lambda=1$) still get only part of the way (\RwOneMtwo).
 
 \begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig4_ce_advice.png}
 \caption{Left: a reactive crowd in which only a share of people use CE advice and the rest see the public display.
@@ -414,8 +510,27 @@ that drivers stay unsure (their belief becomes 0.20 or 0.55). It beats both sile
 adds at most 0.2\% (2.3 seconds per person), about the numerical tolerance of the equilibria. The informed planner
 shows how much room is left (7.5 minutes on the road), and reaching it needs rewards.
 
-\finding{In a large crowd, \emph{what} is said matters, not whether it is said privately. Announcing can backfire; a
-calibrated hint never does worse than silence or full disclosure.}
+\textbf{How bad, and how often?} One bad day at 70\% with probability 0.3 is a single setting, so we vary both
+(Fig.~\ref{fig:robust}, right). On a mild bad day (85\%) announcing helps in every facility. On a severe one (50\%) it
+backfires clearly in \BackfireClear{} of the five facilities, \BackfireList, and barely in \BackfireMarginalList.
+On the road it backfires at every probability we tried (\RoadP). The calibrated hint is never worse than either. So the road result is not a one-off: the worse the bad day, the more often announcing it backfires, which fits the
+explanation above (uncertainty keeps people spread out, and a blunt announcement throws that away).
+
+\textbf{When does privacy pay?} In the five facilities private advice adds at most \PrivMax{} over the best public hint at
+any severity. That is over a menu of 130 schedules, so it is a lower bound on what private advice could do. In the
+small crowd of Section~\ref{sec:exact}, where the linear program covers every schedule (and a public hint is followed by
+the best CE of the belief it creates), privacy saves \PrivSmallSeventy{} on a 70\% day and \PrivSmallFifty{} on a 50\% day for 6--120
+people (Fig.~\ref{fig:exact}, right). In the large-crowd limit of the same game it saves \PrivLimitSeventy{} on the 70\% day, as in
+the facilities, but still \PrivLimitFifty{} on the 50\% day.
+
+\finding{\emph{What} is said matters most: announcing can backfire, and the worse the bad day the more often it does,
+while a calibrated hint never does worse than silence or full disclosure. \emph{Saying it privately} pays in small
+crowds and on severe days, and adds little in large crowds facing mild ones.}
+
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig10_robustness.png}
+\caption{Robustness. Left: price of anarchy with the fluid queue, with random arrival times inside each slot, and with
+random service times as well (same schedules, 200 simulated runs). Right: announcing a bad day relative to telling
+nobody, by how much capacity is left (probability 0.3); above the line announcing backfires.}\label{fig:robust}\end{figure}
 
 \begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig5_uncertainty.png}
 \caption{Left: expected cost of each policy relative to telling nobody. Right: the road. The black curve is $V(q)$,
@@ -432,73 +547,36 @@ a lunch rush after classes (around 13:05) and a dinner rush around 20:10. On spe
 lunch, Wednesday and Sunday dinner) 5\% more students come, the counter runs at 80\% speed and everyone comes 10 minutes
 earlier. We simulate the status quo (no display; students choose by logit with memory) for eight weeks and write
 exactly what the mess office would have: a QR-scan log (date, meal, mess, menu, student id, scan time), where the scan
-time is the arrival time plus the exact queue wait. This gives \textbf{393,747 scans} (Fig.~\ref{fig:messdata}, left).
+time is the arrival time plus the exact queue wait. This gives \textbf{393,747 scans} (Fig.~\ref{fig:messdata} in Appendix~\ref{app:mess}).
 A hidden ground-truth table scores our estimates.
-
-\begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig6_mess_data.png}
-\caption{Left: synthetic QR scans at the Jaiswal dinner, per 10 minutes and by weekday. The flat tops are the serving
-rate; Wednesday and Sunday have special menus. Right: cost per student at every meal under selfish timing and under
-the planner (average of the four messes).}\label{fig:messdata}\end{figure}
 
 \subsection{What the scans reveal}
 A scan happens when the plate is picked up, so waiting is not observed directly. Two facts are still easy to recover
-(Table~\ref{tab:data}). \emph{The serving rate}: while a queue exists, plates leave at rate $\mu$, so the busiest
+(Table~\ref{tab:data} in Appendix~\ref{app:mess}). \emph{The serving rate}: while a queue exists, plates leave at rate $\mu$, so the busiest
 five minutes of scans estimate $\mu$ within 2--3\%. When no queue ever forms (a normal breakfast) this is only a lower
 bound. \emph{Preferred times}: a student's median scan slot on normal days recovers their favourite slot exactly for
 80--100\% of students, and within one slot for 97--100\%. This is all that the advice app of Section~\ref{sec:rec}
-needs. A short-term forecast of the next 30 minutes is accurate to 3.4--4.6 scans per slot (8--14\% of the load),
+needs. Because the scans come from our own model, this shows that the estimators are consistent with it, not that they
+would work on real logs; that needs the pilot of Section~\ref{sec:limits}. A short-term forecast of the next 30 minutes is accurate to 3.4--4.6 scans per slot (8--14\% of the load),
 whether or not it is rescaled by tonight's first scans.
-
-\begin{table}[t]\centering\small
-\caption{Learning the unknowns from the scans alone. Serving rate: Jaiswal. Favourite slots: all 3000 students. Scans per
-slot and forecast error (scans per slot, next 30 minutes, the better of two forecasters): average of the four messes.}\label{tab:data}
-\begin{tabular}{@{}lrrrrr@{}}\toprule
-Meal & true $\mu$ & estimated $\mu$ & favourite slot exact / within 1 & scans per slot & forecast error\\\midrule
-Breakfast, normal / special & 8.0 / 6.4 & 6.2$^{\dagger}$ / 6.6 & 99.6\% / 100\% & 27.7 / 30.9 & 3.4 / 3.6\\
-Lunch, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 91.3\% / 99.5\% & 39.5 / 41.6 & 4.0 / 3.4\\
-Dinner, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 79.5\% / 96.9\% & 41.5 / 43.0 & 4.4 / 3.6\\\bottomrule
-\multicolumn{6}{@{}l}{\footnotesize $^{\dagger}$No queue forms at a normal breakfast, so the scans give only a lower bound.}
-\end{tabular}
-\end{table}
 
 \subsection{Every meal as a game}
 Each mess, meal and menu is one game of Section~\ref{sec:model}, built from the roster (24 games). A normal dinner
 loses 1.8 minutes per student to selfish timing and a special dinner 7.6 (Fig.~\ref{fig:messdata}, right); a normal
 breakfast has no queue at all. Over the four messes and three meals of a normal day this adds up to \textbf{132
-student-hours lost every day}, which the planner's schedule would avoid.
+student-hours lost every day} with the fluid queue, and \HoursRandom{} when arrival times are random (Section~\ref{sec:selfish}).
 
 \subsection{The Jaiswal dinner, day by day}
-Figure~\ref{fig:dinners} replays 40 dinners of a reactive crowd, and Table~\ref{tab:jaiswal} compares every display
+Figure~\ref{fig:dinners} (Appendix~\ref{app:mess}) replays 40 dinners of a reactive crowd, and Table~\ref{tab:jaiswal} (Appendix~\ref{app:mess}) compares every display
 we considered. A public display of yesterday's queue raises the cost from 2.24 (Nash) to 11.55 minutes, and three
 in four students change slot every evening. Making the display older (11.50) or coarser, as Low/Medium/High (12.95),
 does not help, and private noise helps only partly (6.94): anything that everyone reacts to in the same way herds.
 Two things do work: showing the display to at most half of the students (2.1 minutes, Fig.~\ref{fig:messdisplay}, left) or smoothing it into a moving-average forecast
 (2.2). The display delay matters as well. With 30\% of students reacting each day, the daily swing grows from 2\% with
 yesterday's numbers to 11\% with numbers four dinners old (Fig.~\ref{fig:messdisplay}, right): an old signal makes the
-reaction overshoot. CE advice gives 2.24 minutes in every crowd with no swing at all, and with the obedience reward
-the cost falls to \textbf{0.36} minutes, the planner's value.
-
-\begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig7_mess_dinners.png}
-\caption{Jaiswal dinner with a reactive crowd, dinners 51--90. Top: arrivals divided by the counter's capacity (red =
-overload). Bottom: cost per student. The public display makes the rush jump around every evening; CE advice keeps a
-steady schedule.}\label{fig:dinners}\end{figure}
-
-\begin{table}[t]\centering\small
-\caption{Every display policy at the Jaiswal dinner (minutes per student, 30 seeds; Nash 2.24, planner 0.36).}\label{tab:jaiswal}
-\begin{tabular}{@{}lrrr|lrrr@{}}\toprule
-Policy & calm & reactive & noisy & Policy & calm & reactive & noisy\\\midrule
-No information & 1.65 & 2.11 & 1.84 & Display for 30\% of students & 2.02 & 2.10 & 1.89\\
-Public display (yesterday) & 2.12 & \textcolor{cNE}{11.55} & 1.84 & Moving-average forecast & 2.17 & 2.20 & 1.88\\
-Display, 3 dinners old & 4.07 & \textcolor{cNE}{11.50} & 2.73 & CE advice & 2.24 & 2.24 & 2.24\\
-Display + private noise & 2.60 & \textcolor{cNE}{6.94} & 2.51 & Optimum as advice (no reward) & 3.61 & 3.61 & 3.61\\
-Display in 3 levels & 3.83 & \textcolor{cNE}{12.95} & 3.34 & CE advice + reward & \textbf{0.36} & \textbf{0.36} & \textbf{0.36}\\\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[t]\centering\includegraphics[width=0.92\linewidth]{fig8_mess_display.png}
-\caption{Showing information at the mess. Left: a reactive crowd when only a share of students see the display.
-Right: the share of students who change slot every day, by display delay and by the share who reconsider each
-day.}\label{fig:messdisplay}\end{figure}
+reaction overshoot. With rational students CE advice gives 2.24 minutes in every crowd with no swing at all, and with the obedience
+reward the cost falls to \textbf{0.36} minutes, the planner's value (casual students need the margin of
+Section~\ref{sec:reward}).
 
 \subsection{Who gains, and what to say on short-staffed days}
 Coordination asks the flexible students to move, so it is fair to ask who pays. Under selfish timing students lose
@@ -508,49 +586,74 @@ and rigid students with none. Without the reward 36 students would be worse off 
 3 seconds. The reward costs 0.35 minutes per student on average. On a short-staffed evening (70\% speed, probability
 0.3), announcing it lowers the expected cost from 4.47 to 3.47 minutes. On normal evenings it raises the cost (0.88 to
 2.27), because the fear of a slow counter had been keeping students spread out. Unlike on the road, the net effect is
-clearly positive, so the mess should announce it.
+clearly positive, so the mess should announce a mild shortfall. A severe one is different: for the generic mess dinner
+at 50\% speed, announcing raises the expected cost from \MessFiftyNobody{} to \MessFiftyAnn{} minutes, while a calibrated hint lowers it to
+\MessFiftyHint.
 
 \subsection{A plan for the mess office}
 \begin{enumerate}
 \item \textbf{Do not put yesterday's queue on a screen for everyone.} For a reactive crowd it multiplies the dinner
 cost by five. If numbers are shown, show them to a few people or smooth them into a forecast.
-\item \textbf{Send private slot suggestions drawn from a Nash schedule} (a small bot or app). They are obeyed without
-enforcement, never swing, and work for every kind of crowd; inconvenient slots rotate every day.
-\item \textbf{Add a small reward for following the suggestion} (a priority token or a dessert coupon) for the 13\% of
-students sent off-peak, worth about 2.7 minutes each. This takes the dinner from 2.24 to 0.36 minutes per student.
-\item \textbf{On short-staffed evenings, tell students.} It helps at the mess, although the road example shows that it
-should be checked first.
+\item \textbf{Send private slot suggestions drawn from a Nash schedule} (a small bot or app). Students who check them
+obey without enforcement, the crowd stops swinging, and inconvenient slots rotate every day.
+\item \textbf{Add a small reward for following the suggestion} (a dessert coupon, not a priority token) for the 13\% of
+students sent off-peak, worth about 2.7 minutes each, plus a margin of 1--2 minutes' worth so that casual students
+follow too. This takes the dinner from 2.24 towards 0.36 minutes per student.
+\item \textbf{On mildly short-staffed evenings, tell students; on badly short-staffed ones, give a calibrated hint}
+(``it may be slow tonight'') rather than a blunt announcement, which then backfires.
 \item \textbf{Recalibrate weekly from the QR scans}: the serving rate from the busy stretches, the preferred times from
 each student's usual scan time.
 \end{enumerate}
 
 % ============================================================================
 \section{What we built}\label{sec:built}
-\begin{figure}[t]\centering\includegraphics[width=0.78\linewidth]{screenshots.png}
-\caption{The website and the interactive lab. (a)~Website overview with the guided demo. (b)~A student's phone: the
-recommended slot is their cheapest choice, so the advice is self-enforcing. (c)~Lab, public display, road, reactive
-crowd: the stripes are the rush jumping between slots. (d)~Lab, correlated advice: the Nash schedule is obeyed; the
-optimum is not, unless a reward is added.}\label{fig:shots}\end{figure}
-
 \textbf{Library} (\texttt{crowd/}, Python with NumPy and SciPy/HiGHS): \texttt{game.py} (queue, game, Nash, optimum
 and large-crowd solvers), \texttt{correlated.py} (recommender, obedience, CE linear programs, reward, who gains, bad-day
 information design), \texttt{simulate.py} (simulator, displays, behaviour, learners), \texttt{domains.py} and
-\texttt{mess.py} (facilities, mess scenario, scan generator, calibration), \texttt{theory.py} (small games).
-\textbf{Checks}: 58 unit tests, e.g.\ Pigou's 4/3 for linear costs, Proposition~\ref{p2} on the mess dinner, and
-``private advice $\le$ best public hint $\le$ silence and announcing''. \textbf{Experiments}: \texttt{python
-experiments.py} runs E1--E7 in about 13 minutes and writes every figure, the results and the website's data.
+\texttt{mess.py} (facilities, mess scenario, scan generator, calibration), \texttt{theory.py} (small games),
+\texttt{smallcrowd.py} (small crowds solved exactly: best CE, pure and mixed Nash, private and public advice).
+\textbf{Checks} (Table~\ref{tab:checks}): \ChecksPass{} of \ChecksAll{} verification checks pass, and 72 unit tests, e.g.\ Pigou's 4/3 for linear costs, Proposition~\ref{p2} on the mess dinner, the
+exact small-crowd CE against the full linear program over all profiles, the mixed equilibrium against support
+enumeration, and ``private advice $\le$ best public hint $\le$ silence and announcing''. \textbf{Experiments}:
+\texttt{python experiments.py} runs E1--E10 in about \RunMinutes{} minutes and writes every figure, the results and the website's
+data.
 \textbf{Website}: one page per step of the story with a 13-step automatic guided demo. \textbf{Interactive lab}: every
-experiment live, for any facility or mess, with your own parameters (Fig.~\ref{fig:shots}).
+experiment live, for any facility or mess, with your own parameters (links on page 1).
 
 % ============================================================================
-\section{Limitations and future work}
+\begin{table}[t]\centering\small
+\caption{Verification checks, recomputed by every run of \texttt{experiments.py}.}\label{tab:checks}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.6cm}>{\raggedright\arraybackslash}p{6.2cm}>{\raggedright\arraybackslash}p{4.2cm}l@{}}\toprule
+Check & What must hold & Result & Verdict\\\midrule
+\csname @@input\endcsname generated/tab_checks.tex 
+\bottomrule\end{tabular}\end{table}
+
+\section{Claims and evidence}\label{sec:claims}
+Table~\ref{tab:claims} lists every claim this report makes, the evidence for it and how far it holds.
+
+\begin{table}[t]\centering\small
+\caption{The claims of this report and the evidence for each.}\label{tab:claims}
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{4.6cm}>{\raggedright\arraybackslash}p{7.4cm}>{\raggedright\arraybackslash}p{2.2cm}@{}}\toprule
+ & Claim & Evidence & Verdict\\\midrule
+C1 & Selfish timing wastes time. & Price of anarchy 3.3--8.0 (fluid queue), \PoaRandom{} with random arrivals; \LostRoad{} minutes per car. & Holds; smaller with random arrivals\\
+C2 & A display that everyone reacts to causes herding. & 3.7--17$\times$ Nash for a reactive crowd in all five facilities; 30\% viewers or private advice remove it (paired tests). & Holds for reactive crowds\\
+C3 & Correlation beats Nash only when one person's move matters. & Exact small crowds: beats every pure Nash in \EightBetter{} of \EightWith{} sizes, fading to \EightFade{} at 51--60; never worse in \VarCount{} crowd shapes; Proposition~\ref{p2}; large-crowd LP = Nash. & Holds; not at every size\\
+C4 & The obedience reward makes the planner's schedule self-enforcing. & Rational users: planner's cost, nobody worse off. Noisy users: \RwThreeMzero$\times$ Nash, \RwThreeMtwo$\times$ with a 2-minute margin. & Holds; needs a margin\\
+C5 & Announcing a bad day can backfire. & Road +20\%; on severe days clearly in \BackfireClear{} facilities, barely in \BackfireMarginal; never on mild days; the calibrated hint never does worse. & Holds\\
+C6 & Privacy matters in small crowds and on severe days. & Small crowds \PrivSmallSeventy{} (70\% day), \PrivSmallFifty{} (50\%); large-crowd limit \PrivLimitSeventy{} and \PrivLimitFifty; facilities at most \PrivMax{} over a menu. & Partly: facilities give only a lower bound\\
+\bottomrule\end{tabular}\end{table}
+
+\section{Limitations and future work}\label{sec:limits}
 All data are synthetic, so the conclusions concern mechanisms (herding, obedience, the price of obedience, the value
-of a hint) rather than exact IITGN minutes. The fluid queue spreads arrivals evenly within a slot, which makes the
-optimum's zero wait optimistic. Without a potential function we report $\varepsilon$-equilibria (at most 7\,s) and
-use exact large-crowd equilibria where it matters. Behaviour models are assumptions, so we report three crowds. The
-bad-day study has two states and one prior. Next steps: a Telegram-bot pilot in one mess; priority tokens as a non-monetary reward; letting
-students choose between messes (a routing game, where Braess effects are possible); and a second scan at the queue
-entrance to measure waiting directly.
+of a hint) rather than exact IITGN minutes, and recovering parameters from our own scans shows consistency, not
+validity. The fluid queue makes the planner look better than it is: with random arrivals the price of anarchy falls
+from 3.3--8.0 to \PoaRandom{} (Section~\ref{sec:selfish}); we re-evaluated the schedules under randomness but did not
+re-solve the equilibria for it. Proposition~\ref{p2} covers separable costs; for our queue it is checked over menus of
+schedules, and exactly only for small identical crowds. The private-advice linear program for the five facilities
+also uses a menu, so its small gain is a lower bound. Without a potential function we report $\varepsilon$-equilibria
+(at most 7\,s). Behaviour models are assumptions: three crowds, and rational or logit app users. Next steps: a
+Telegram-bot pilot in one mess with a second scan at the queue entrance to measure waiting directly; coupons as the
+reward; and letting students choose between messes (a routing game, where Braess effects are possible).
 
 % ============================================================================
 \needspace{16\baselineskip}
@@ -599,6 +702,50 @@ semester, and the manual queue-timing study by the generator's ground-truth wait
 \bibitem{auer} P.~Auer, N.~Cesa-Bianchi, Y.~Freund, R.~E.~Schapire. The nonstochastic multiarmed bandit problem. \emph{SIAM J.\ Comput.}, 32(1):48--77, 2002.
 \bibitem{harsanyi} J.~C.~Harsanyi. Games with incomplete information played by ``Bayesian'' players, I--III. \emph{Management Science}, 14(3):159--182, 1967.
 \bibitem{kamenica} E.~Kamenica, M.~Gentzkow. Bayesian persuasion. \emph{American Economic Review}, 101(6):2590--2615, 2011.
+\bibitem{holm} S.~Holm. A simple sequentially rejective multiple test procedure. \emph{Scand.\ J.\ Statist.}, 6(2):65--70, 1979.
 \bibitem{bergemann} D.~Bergemann, S.~Morris. Bayes correlated equilibrium and the comparison of information structures in games. \emph{Theoretical Economics}, 11(2):487--522, 2016.
 \end{thebibliography}
+
+\clearpage
+\appendix
+\section{Additional mess results}\label{app:mess}
+\begin{table}[h]\centering\small
+\caption{Learning the unknowns from the scans alone. Serving rate: Jaiswal. Favourite slots: all 3000 students. Scans per
+slot and forecast error (scans per slot, next 30 minutes, the better of two forecasters): average of the four messes.}\label{tab:data}
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+Meal & true $\mu$ & estimated $\mu$ & favourite slot exact / within 1 & scans per slot & forecast error\\\midrule
+Breakfast, normal / special & 8.0 / 6.4 & 6.2$^{\dagger}$ / 6.6 & 99.6\% / 100\% & 27.7 / 30.9 & 3.4 / 3.6\\
+Lunch, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 91.3\% / 99.5\% & 39.5 / 41.6 & 4.0 / 3.4\\
+Dinner, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 79.5\% / 96.9\% & 41.5 / 43.0 & 4.4 / 3.6\\\bottomrule
+\multicolumn{6}{@{}l}{\footnotesize $^{\dagger}$No queue forms at a normal breakfast, so the scans give only a lower bound.}
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]\centering\includegraphics[width=\linewidth]{fig7_mess_dinners.png}
+\caption{Jaiswal dinner with a reactive crowd, dinners 51--90. Top: arrivals divided by the counter's capacity (red =
+overload). Bottom: cost per student. The public display makes the rush jump around every evening; CE advice keeps a
+steady schedule.}\label{fig:dinners}\end{figure}
+
+\begin{figure}[h]\centering\includegraphics[width=\linewidth]{fig6_mess_data.png}
+\caption{Left: synthetic QR scans at the Jaiswal dinner, per 10 minutes and by weekday. The flat tops are the serving
+rate; Wednesday and Sunday have special menus. Right: cost per student at every meal under selfish timing and under
+the planner (average of the four messes).}\label{fig:messdata}\end{figure}
+
+\begin{table}[h]\centering\small
+\caption{Every display policy at the Jaiswal dinner (minutes per student, 30 seeds; Nash 2.24, planner 0.36).}\label{tab:jaiswal}
+\begin{tabular}{@{}lrrr|lrrr@{}}\toprule
+Policy & calm & reactive & noisy & Policy & calm & reactive & noisy\\\midrule
+No information & 1.65 & 2.11 & 1.84 & Display for 30\% of students & 2.02 & 2.10 & 1.89\\
+Public display (yesterday) & 2.12 & \textcolor{cNE}{11.55} & 1.84 & Moving-average forecast & 2.17 & 2.20 & 1.88\\
+Display, 3 dinners old & 4.07 & \textcolor{cNE}{11.50} & 2.73 & CE advice & 2.24 & 2.24 & 2.24\\
+Display + private noise & 2.60 & \textcolor{cNE}{6.94} & 2.51 & Optimum as advice (no reward) & 3.61 & 3.61 & 3.61\\
+Display in 3 levels & 3.83 & \textcolor{cNE}{12.95} & 3.34 & CE advice + reward & \textbf{0.36} & \textbf{0.36} & \textbf{0.36}\\\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]\centering\includegraphics[width=0.92\linewidth]{fig8_mess_display.png}
+\caption{Showing information at the mess. Left: a reactive crowd when only a share of students see the display.
+Right: the share of students who change slot every day, by display delay and by the share who reconsider each
+day.}\label{fig:messdisplay}\end{figure}
+
 \end{document}

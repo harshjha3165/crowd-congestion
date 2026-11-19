@@ -77,6 +77,34 @@ Compliance (reactive crowd, non-users see the display), cost relative to Nash:
 |     0.9 |   1.02 |      0.98 |         1    |  1.1  |   0.94 |
 |     1   |   1    |      1    |         1    |  1    |   1    |
 
+App users as noisy as everyone else (logit lambda), with a reward margin of m minutes; cost relative to Nash:
+
+|                                  |   road |   network |   restaurant |   gym |   mess |
+|:---------------------------------|-------:|----------:|-------------:|------:|-------:|
+| ('CE advice', 1.0, 0.0)          |   1.21 |      0.78 |         0.88 |  1.13 |   0.51 |
+| ('CE advice', 1.0, 1.0)          |   1.15 |      0.78 |         0.82 |  1.29 |   0.54 |
+| ('CE advice', 1.0, 2.0)          |   1.08 |      0.81 |         0.87 |  1.21 |   0.71 |
+| ('CE advice', 3.0, 0.0)          |   1.23 |      1.08 |         0.81 |  1.85 |   0.48 |
+| ('CE advice', 3.0, 1.0)          |   1.04 |      0.93 |         0.98 |  1.1  |   0.91 |
+| ('CE advice', 3.0, 2.0)          |   1    |      1    |         1    |  1.01 |   1    |
+| ('CE advice + reward', 1.0, 0.0) |   0.79 |      3.03 |         1.25 |  2.02 |   0.96 |
+| ('CE advice + reward', 1.0, 1.0) |   0.54 |      2.15 |         0.8  |  1.21 |   0.58 |
+| ('CE advice + reward', 1.0, 2.0) |   0.39 |      1.29 |         0.5  |  0.67 |   0.33 |
+| ('CE advice + reward', 3.0, 0.0) |   0.76 |      2.8  |         1    |  1.81 |   0.72 |
+| ('CE advice + reward', 3.0, 1.0) |   0.31 |      0.58 |         0.3  |  0.38 |   0.18 |
+| ('CE advice + reward', 3.0, 2.0) |   0.27 |      0.32 |         0.23 |  0.22 |   0.13 |
+
+Reward budget, minutes per person:
+
+|                             |   road |   network |   restaurant |   gym |   mess |
+|:----------------------------|-------:|----------:|-------------:|------:|-------:|
+| ('CE advice', 0.0)          |   0    |      0    |         0    |  0    |   0    |
+| ('CE advice', 1.0)          |   1    |      1    |         1    |  1    |   1    |
+| ('CE advice', 2.0)          |   2    |      2    |         2    |  2    |   2    |
+| ('CE advice + reward', 0.0) |   4.48 |      1.09 |         0.48 |  0.27 |   0.27 |
+| ('CE advice + reward', 1.0) |   5.48 |      2.09 |         1.48 |  1.27 |   1.27 |
+| ('CE advice + reward', 2.0) |   6.48 |      3.09 |         2.48 |  2.27 |   2.27 |
+
 ## E5 Who should be told what (bad day: capacity 70%, probability 0.3; large-crowd limit)
 
 | domain     |   tell nobody |   announce the state |   best public hint |   private advice |   planner, informed |   P(busy|bad) |   P(busy|normal) |   tolerance (s) |
@@ -206,3 +234,137 @@ Nowcasting MAE (scans per slot):
 | lunch     | special |                3.364 |              3.564 |
 | dinner    | normal  |                4.413 |              4.576 |
 | dinner    | special |                4.371 |              3.635 |
+With random arrival times inside each slot the same schedules lose 99 student-hours a day instead of 132.
+
+
+## E8 Small crowds, solved exactly
+
+Identical people, 3 slots, everyone prefers the middle one, load 0.8. Every schedule is listed, so all values are exact (minutes per person).
+
+- The best CE is strictly cheaper than every pure Nash equilibrium in 52 of the 56 sizes from 2 to 60 that have one; no pure Nash exists for n = [7, 9, 11].
+- Largest advantage at n = 10: pure Nash 2.12, best CE 1.56, planner 1.20 (60% of the gap closed). For n = 51-60 the best CE closes 2.2% of the gap.
+- Against people who cannot coordinate at all (symmetric mixed Nash) the best CE is still 1.35x cheaper at n = 60.
+
+|   n |   schedules |   optimum |   best_cce |   best_ce |   best_pure_nash |   mixed_nash |   pure_nash_count |   gap_closed |   ce_support |
+|----:|------------:|----------:|-----------:|----------:|-----------------:|-------------:|------------------:|-------------:|-------------:|
+|   2 |           6 |     3     |      3     |     3     |            3     |        4.909 |                 1 |        0     |            1 |
+|   4 |          15 |     1.625 |      1.625 |     1.625 |            1.625 |        3.693 |                 1 |        0     |            1 |
+|   6 |          28 |     1.333 |      1.467 |     1.5   |            1.556 |        3.283 |                 1 |        0.25  |            2 |
+|   8 |          45 |     1.25  |      1.463 |     1.508 |            1.536 |        3.111 |                 1 |        0.097 |            2 |
+|  10 |          66 |     1.2   |      1.491 |     1.565 |            2.12  |        3.02  |                 1 |        0.604 |            2 |
+|  12 |          91 |     1.167 |      1.544 |     1.714 |            2     |        2.962 |                 1 |        0.344 |            3 |
+|  16 |         153 |     1.239 |      1.713 |     1.97  |            2.25  |        2.897 |                 1 |        0.276 |            3 |
+|  20 |         231 |     1.2   |      1.749 |     1.937 |            2.12  |        2.863 |                 1 |        0.199 |            3 |
+|  30 |         496 |     1.2   |      1.843 |     2.028 |            2.12  |        2.827 |                 2 |        0.1   |            3 |
+|  40 |         861 |     1.193 |      1.89  |     2.062 |            2.1   |        2.808 |                 1 |        0.042 |            3 |
+|  60 |        1891 |     1.167 |      1.91  |     1.989 |            2     |        2.684 |                 1 |        0.013 |            3 |
+
+Bad days in a small crowd (probability 0.3), minutes per person:
+
+|   slow |   n |   tell_nobody |   announce |   public_hint |   private |   planner |   privacy_gain |
+|-------:|----:|--------------:|-----------:|--------------:|----------:|----------:|---------------:|
+|    0.7 |   6 |         2.464 |      2.213 |         2.213 |     2.121 |     1.976 |          0.041 |
+|    0.7 |   8 |         2.807 |      2.531 |         2.531 |     2.36  |     1.861 |          0.068 |
+|    0.7 |  10 |         2.997 |      2.495 |         2.495 |     2.448 |     1.603 |          0.019 |
+|    0.7 |  12 |         3.128 |      2.822 |         2.822 |     2.608 |     1.66  |          0.076 |
+|    0.7 |  16 |         3.297 |      3.071 |         3.071 |     2.752 |     1.692 |          0.104 |
+|    0.7 |  20 |         3.333 |      3.083 |         3.083 |     2.738 |     1.603 |          0.112 |
+|    0.7 |  30 |         3.659 |      3.227 |         3.227 |     2.875 |     1.603 |          0.109 |
+|    0.7 |  40 |         3.748 |      3.272 |         3.272 |     2.983 |     1.58  |          0.088 |
+|    0.7 |  60 |         3.886 |      3.23  |         3.23  |     3.012 |     1.54  |          0.068 |
+|    0.7 |  80 |         4.188 |      3.256 |         3.256 |     3.088 |     1.541 |          0.051 |
+|    0.7 | 120 |         4.204 |      3.24  |         3.24  |     3.099 |     1.51  |          0.043 |
+|    0.5 |   6 |         5.291 |      4.95  |         4.907 |     4.429 |     3.583 |          0.097 |
+|    0.5 |   8 |         5.892 |      7.356 |         5.384 |     4.675 |     3.275 |          0.132 |
+|    0.5 |  10 |         6.256 |      7.395 |         5.599 |     4.803 |     3.012 |          0.142 |
+|    0.5 |  12 |         6.172 |      7.5   |         5.729 |     4.847 |     3.017 |          0.154 |
+|    0.5 |  16 |         6.792 |      7.679 |         6.018 |     5.291 |     3.117 |          0.121 |
+|    0.5 |  20 |         6.996 |      7.656 |         6.112 |     5.488 |     3.012 |          0.102 |
+|    0.5 |  30 |         7.084 |      7.72  |         6.276 |     5.7   |     3.008 |          0.092 |
+|    0.5 |  40 |         7.113 |      7.743 |         6.343 |     5.822 |     2.965 |          0.082 |
+|    0.5 |  60 |         7.134 |      7.693 |         6.37  |     5.946 |     2.897 |          0.066 |
+|    0.5 |  80 |         7.145 |      7.714 |         6.463 |     6.036 |     2.908 |          0.066 |
+|    0.5 | 120 |         7.154 |      7.699 |         6.46  |     6.09  |     2.867 |          0.057 |
+
+Same game in the large-crowd limit: bad day at 70%: private advice saves 0.02% over the best public hint; bad day at 50%: private advice saves 5.71% over the best public hint.
+
+## E9 Robustness
+
+Random arrival times inside each slot (fluid schedules re-evaluated by simulation):
+
+| domain     |   worst_nash_fluid |   worst_nash_random |   worst_nash_random_exp |   best_nash_fluid |   best_nash_random |   best_nash_random_exp |   opt_fluid |   opt_random |   opt_random_exp |   poa_fluid |   lost_fluid |   poa_random |   lost_random |   poa_random_exp |   lost_random_exp |
+|:-----------|-------------------:|--------------------:|------------------------:|------------------:|-------------------:|-----------------------:|------------:|-------------:|-----------------:|------------:|-------------:|-------------:|--------------:|-----------------:|------------------:|
+| road       |             17.124 |              17.248 |                  17.292 |            16.98  |             17.093 |                 17.132 |       4.503 |        5.371 |            6.293 |       3.803 |       12.622 |        3.211 |        11.877 |            2.748 |            10.999 |
+| network    |              3.705 |               3.808 |                   4.353 |             3.69  |              3.793 |                  4.339 |       1.126 |        2.084 |            3.182 |       3.291 |        2.579 |        1.827 |         1.724 |            1.368 |             1.171 |
+| restaurant |              2.346 |               2.946 |                   3.337 |             2.242 |              2.848 |                  3.251 |       0.497 |        1.325 |            2.031 |       4.723 |        1.849 |        2.223 |         1.621 |            1.643 |             1.306 |
+| gym        |              1.675 |               2.809 |                   4.868 |             1.444 |              2.654 |                  4.742 |       0.308 |        2.122 |            4.355 |       5.432 |        1.367 |        1.324 |         0.687 |            1.118 |             0.513 |
+| mess       |              2.21  |               2.375 |                   2.799 |             2.159 |              2.329 |                  2.754 |       0.278 |        0.849 |            1.426 |       7.952 |        1.932 |        2.798 |         1.526 |            1.964 |             1.374 |
+
+Bad-day sweep (large-crowd limit, expected minutes per person):
+
+| domain     |   slow |   p_bad |   tell nobody |   announce the state |   best public hint |   private advice |   planner, informed |   announce_vs_nobody |   privacy_gain |
+|:-----------|-------:|--------:|--------------:|---------------------:|-------------------:|-----------------:|--------------------:|---------------------:|---------------:|
+| road       |   0.5  |     0.3 |        37.115 |               52.038 |             35.137 |           35.052 |              16.275 |                1.402 |          0.002 |
+| road       |   0.7  |     0.3 |        22.558 |               27.037 |             21.905 |           21.867 |               7.474 |                1.198 |          0.002 |
+| road       |   0.85 |     0.3 |        19.909 |               19.308 |             18.569 |           18.532 |               5.315 |                0.97  |          0.002 |
+| network    |   0.5  |     0.3 |        21.09  |               19.092 |             19.092 |           19.09  |               4.686 |                0.905 |          0     |
+| network    |   0.7  |     0.3 |         6.476 |                5.408 |              5.408 |            5.407 |               1.541 |                0.835 |          0     |
+| network    |   0.85 |     0.3 |         4.619 |                4.202 |              4.202 |            4.202 |               1.273 |                0.91  |          0     |
+| restaurant |   0.5  |     0.3 |        12.338 |               12.514 |             11.649 |           11.632 |               2.784 |                1.014 |          0.002 |
+| restaurant |   0.7  |     0.3 |         5.359 |                3.9   |              3.9   |            3.894 |               0.887 |                0.728 |          0.002 |
+| restaurant |   0.85 |     0.3 |         3.863 |                2.826 |              2.826 |            2.825 |               0.64  |                0.731 |          0     |
+| gym        |   0.5  |     0.3 |        22.306 |               26.362 |             20.641 |           20.471 |               5.366 |                1.182 |          0.008 |
+| gym        |   0.7  |     0.3 |         7.071 |                3.589 |              3.589 |            3.584 |               0.746 |                0.507 |          0.001 |
+| gym        |   0.85 |     0.3 |         3.916 |                2.514 |              2.514 |            2.504 |               0.433 |                0.642 |          0.004 |
+| mess       |   0.5  |     0.3 |        10.933 |               13.461 |             10.376 |           10.358 |               2.708 |                1.231 |          0.002 |
+| mess       |   0.7  |     0.3 |         4.249 |                3.194 |              3.13  |            3.13  |               0.62  |                0.752 |          0     |
+| mess       |   0.85 |     0.3 |         3.03  |                2.538 |              2.408 |            2.406 |               0.39  |                0.838 |          0.001 |
+| road       |   0.7  |     0.1 |        19.891 |               20.404 |             18.546 |           18.482 |               5.494 |                1.026 |          0.003 |
+| road       |   0.7  |     0.5 |        25.9   |               33.669 |             25.708 |           25.684 |               9.456 |                1.3   |          0.001 |
+
+Small crowds of other shapes (crowd sizes 4, 6, 8, 10, 12, 16, 20, 30, 40):
+
+| crowd                                   |   sizes |   with_pure_nash |   ce_beats_pure |   max_saving_pure |   min_saving_mixed |   max_saving_mixed |
+|:----------------------------------------|--------:|-----------------:|----------------:|------------------:|-------------------:|-------------------:|
+| base: 1 type, 3 slots, load 0.8, beta 2 |       9 |                9 |               8 |             0.262 |              0.266 |              0.56  |
+| lighter load (0.6)                      |       9 |                9 |               9 |             0.359 |              0.083 |              0.505 |
+| full load (1.0)                         |       9 |                1 |               0 |             0     |              0.063 |              0.725 |
+| more flexible (beta 1)                  |       9 |                6 |               1 |             0.242 |              0.275 |              0.693 |
+| more rigid (beta 4)                     |       9 |                9 |               3 |             0.079 |              0.056 |              0.31  |
+| 4 slots                                 |       9 |                1 |               1 |             0.029 |              0.113 |              0.605 |
+| 2 types: flexible and rigid             |       9 |                9 |               3 |             0.225 |            nan     |            nan     |
+| 2 groups: middle and late               |       9 |                9 |               7 |             0.206 |            nan     |            nan     |
+
+## E10 Verification checks and paired tests
+
+| check                           | must                                                                    | result                        | pass   |
+|:--------------------------------|:------------------------------------------------------------------------|:------------------------------|:-------|
+| Pigou, linear costs             | price of anarchy 4/3 by formula and numerically                         | 1.333333 and 1.333333         | True   |
+| Exact small-crowd CE (6 people) | schedule LP = LP over all $3^6$ profiles                                | difference 0.0e+00 min        | True   |
+| Symmetric mixed Nash (2 people) | same as support enumeration                                             | largest difference 1.1e-16    | True   |
+| Proposition 1 (5 facilities)    | gain from disobeying CE advice $\le$ equilibrium accuracy $\varepsilon$ | largest excess 0.0 s          | True   |
+| Proposition 3 (5 facilities)    | after the reward nobody gains by moving                                 | largest gain 0.0e+00 min      | True   |
+| Proposition 2, large crowd      | best CE over the menu = Nash                                            | largest gap 0.01 s            | True   |
+| Random-arrival queue            | matches the fluid queue under heavy load                                | relative difference 1.4%      | True   |
+| Bad days (all runs)             | private $\le$ best public hint $\le$ min(silence, announcing)           | largest violation 0.0e+00 min | True   |
+| Bayes CE with one state         | = the best CE                                                           | difference 1.8e-16 min        | True   |
+
+Paired sign-flip permutation tests over seeds, Holm-adjusted within each family:
+
+| family                                              | domain     |   mean_diff |      p |   n |   p_holm |
+|:----------------------------------------------------|:-----------|------------:|-------:|----:|---------:|
+| display vs CE advice (reactive)                     | road       |     45.814  | 0      |  30 |   0.0002 |
+| display vs CE advice (reactive)                     | network    |     19.9254 | 0      |  30 |   0.0002 |
+| display vs CE advice (reactive)                     | restaurant |      9.3883 | 0      |  30 |   0.0002 |
+| display vs CE advice (reactive)                     | gym        |     23.1829 | 0      |  30 |   0.0002 |
+| display vs CE advice (reactive)                     | mess       |      9.2874 | 0      |  30 |   0.0002 |
+| display for 30% vs display (reactive)               | road       |    -47.37   | 0      |  30 |   0.0002 |
+| display for 30% vs display (reactive)               | network    |    -18.6253 | 0      |  30 |   0.0002 |
+| display for 30% vs display (reactive)               | restaurant |     -9.4353 | 0      |  30 |   0.0002 |
+| display for 30% vs display (reactive)               | gym        |    -23.0427 | 0      |  30 |   0.0002 |
+| display for 30% vs display (reactive)               | mess       |     -9.672  | 0      |  30 |   0.0002 |
+| reward + 2-min margin vs exact reward (noisy users) | road       |     -8.4044 | 0.0021 |  10 |   0.0107 |
+| reward + 2-min margin vs exact reward (noisy users) | network    |     -9.1731 | 0.0021 |  10 |   0.0107 |
+| reward + 2-min margin vs exact reward (noisy users) | restaurant |     -1.7328 | 0.0021 |  10 |   0.0107 |
+| reward + 2-min margin vs exact reward (noisy users) | gym        |     -2.2901 | 0.0021 |  10 |   0.0107 |
+| reward + 2-min margin vs exact reward (noisy users) | mess       |     -1.2747 | 0.0021 |  10 |   0.0107 |

@@ -427,3 +427,117 @@ def test_reward_leaves_nobody_worse_than_nash(dinner):
     w = who_gains(inst.game, b.best_nash.X, b.optimum.X)
     assert w.worse_off("with_reward") == 0
     assert (w.with_reward * inst.game.counts).sum() <= (w.nash * inst.game.counts).sum()
+
+
+# ############################################################################
+# Small crowds solved exactly (smallcrowd.py), noisy app users, random arrivals
+# ############################################################################
+from crowd.game import random_arrival_cost, random_arrival_wait  # noqa: E402
+from crowd.smallcrowd import (all_schedules, exact_ce, small_crowd_game, small_crowd_information,  # noqa: E402
+                              symmetric_mixed_nash)
+from crowd.theory import NormalFormGame  # noqa: E402
+
+
+def _normal_form(g):
+    n, T = g.n, g.T
+    costs = np.zeros((n,) + (T,) * n)
+    for s in np.ndindex(*(T,) * n):
+        c = g.costs(np.bincount(s, minlength=T)[None, :])[0]
+        for i in range(n):
+            costs[(i, *s)] = c[s[i]]
+    return NormalFormGame(costs)
+
+
+def test_all_schedules_lists_every_schedule_once():
+    g = SlotGame(FluidQueue(0.5, T=3), tau=[0, 2], beta=[1.0, 2.0], counts=[3, 2])
+    S = all_schedules(g)
+    assert len(S) == 10 * 6 == len({X.tobytes() for X in S})  # C(5,2) * C(4,2)
+    assert all(np.array_equal(X.sum(1), g.counts) for X in S)
+
+
+def test_exact_ce_matches_full_normal_form_lp():
+    """Listing schedules and shuffling loses nothing: same values as the LP over all 3^6 profiles."""
+    g = small_crowd_game(6)
+    nf, r = _normal_form(g), exact_ce(g)
+    assert r.best_ce == pytest.approx(nf.correlated_equilibrium("best").total_cost, abs=1e-6)
+    assert r.best_cce == pytest.approx(nf.correlated_equilibrium("best", coarse=True).total_cost, abs=1e-6)
+    assert r.best_nash == pytest.approx(min(nf.total_cost(s) for s in nf.pure_nash()), abs=1e-9)
+    assert r.optimum == pytest.approx(nf.social_optimum()[1], abs=1e-9)
+
+
+def test_symmetric_mixed_nash_matches_support_enumeration():
+    g = small_crowd_game(2)
+    nf = _normal_form(g)
+    sym = [(x, y) for x, y in nf.mixed_nash_2p() if np.allclose(x, y)]
+    ours = symmetric_mixed_nash(g)
+    assert len(sym) == len(ours) == 1
+    assert ours[0].sigma == pytest.approx(sym[0][0], abs=1e-5)
+    assert ours[0].cost == pytest.approx(nf.expected_costs(nf.product_distribution(list(sym[0]))).sum(), abs=1e-6)
+
+
+def test_small_crowd_ce_beats_every_nash():
+    r = exact_ce(small_crowd_game(10))
+    assert r.optimum < r.best_cce <= r.best_ce + 1e-9 < r.best_nash < r.mixed_nash
+    assert r.gap_closed == pytest.approx(0.604, abs=0.005)  # pure Nash 2.12, CE 1.56, planner 1.20 per person
+
+
+def test_ce_advantage_over_pure_nash_fades_with_size():
+    small, large = exact_ce(small_crowd_game(10), mixed=False), exact_ce(small_crowd_game(60), mixed=False)
+    assert large.gap_closed < 0.05 < small.gap_closed
+
+
+def test_ce_exists_without_a_pure_nash():
+    r = exact_ce(small_crowd_game(7), mixed=False)
+    assert r.n_nash == 0 and np.isnan(r.best_nash) and r.optimum <= r.best_ce
+
+
+@pytest.mark.parametrize("n,slow", [(6, 0.7), (12, 0.5), (20, 0.7)])
+def test_small_crowd_information_ordering(n, slow):
+    r = small_crowd_information(small_crowd_game(n), bad_factor=slow)
+    assert r.planner - 1e-6 <= r.private <= r.public_hint + 1e-6
+    assert r.public_hint <= min(r.tell_nobody, r.announce) + 1e-6
+
+
+def test_privacy_matters_in_a_small_crowd():
+    r = small_crowd_information(small_crowd_game(20), bad_factor=0.5)
+    assert r.privacy_gain == pytest.approx(0.102, abs=0.005)  # private 5.49 vs best public hint 6.11 per person
+
+
+def test_noisy_app_users_reduce_to_obedience_when_rational(dinner):
+    inst, b = dinner
+    g = inst.game
+    ob = obedience(g, b.optimum.X)  # reward + a small margin: obeying is strictly best for everyone
+    pol = Recommend(target=b.optimum.X, type_of=inst.type_of, noise=1e6, dev_costs=g.deviation_costs(b.optimum.X),
+                    bonus=ob.gain_by_cell + 0.01)
+    res = simulate(g.congestion, inst.tau, inst.beta, pol, Logit(), days=5, burn_in=1, seed=0)
+    assert res.metrics["mean_cost"] == pytest.approx(b.optimum.social_cost / g.n, rel=1e-9)
+    with pytest.raises(ValueError):
+        Recommend(target=b.best_nash.X, type_of=inst.type_of, noise=1.0).setup(g.n, g.T, np.random.default_rng(0))
+
+
+def test_noisy_app_users_disobey_a_knife_edge_schedule(dinner):
+    """At a Nash schedule people are nearly indifferent, so noisy users leave it; a margin brings them back."""
+    inst, b = dinner
+    g = inst.game
+    D = g.deviation_costs(b.optimum.X)
+    ob = obedience(g, b.optimum.X)
+
+    def cost(m):
+        pol = Recommend(target=b.optimum.X, type_of=inst.type_of, noise=3.0, dev_costs=D, bonus=ob.gain_by_cell + m)
+        return simulate(g.congestion, inst.tau, inst.beta, pol, Logit(), days=20, burn_in=5, seed=0).metrics["mean_cost"]
+
+    opt = b.optimum.social_cost / g.n
+    assert cost(0.0) > 2 * opt and cost(2.0) < 1.2 * opt
+
+
+def test_random_arrivals_match_fluid_under_heavy_load():
+    m = FluidQueue(1.0, T=2, slot_minutes=10.0)
+    assert random_arrival_wait(m, np.array([60, 0]), reps=300)[0] == pytest.approx(m.wait(np.array([60.0, 0.0]))[0], rel=0.05)
+
+
+def test_random_arrivals_make_the_planner_wait(dinner):
+    inst, b = dinner
+    g = inst.game
+    assert g.congestion.wait(g.loads(b.optimum.X).astype(float)).max() == pytest.approx(0.0, abs=1e-9)
+    assert random_arrival_cost(g, b.optimum.X, reps=50) > 1.5 * g.social_cost(b.optimum.X)
+    assert random_arrival_cost(g, b.nash.X, reps=50) > g.social_cost(b.nash.X)

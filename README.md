@@ -27,11 +27,11 @@ detailed (synthetic) case study of the four IITGN messes: 3000 students, 3 meals
 
 | | Step | Finding | |
 |---|---|---|---|
-| 1 | **Selfish timing** | The Nash equilibrium costs **3.3–8.0×** the planner's schedule in all five facilities; at the four messes that is **132 student-hours lost per normal day**. | E2 |
+| 1 | **Selfish timing** | The Nash equilibrium costs **3.3–8.0×** the planner's schedule in all five facilities with the fluid queue, and **1.3–3.2×** when arrival times inside a slot are random (the planner then also waits). At the four messes that is **132 student-hours lost per normal day**. | E2, E9 |
 | 2 | **Public display** | If everyone reacts to the same numbers, the rush jumps between slots: a public display costs **3.7–17× Nash** for a reactive crowd. Showing it to only 30% of people removes most of the damage. | E3 |
-| 3 | **Private advice (CE)** | Shuffled recommendations from a Nash schedule are a correlated equilibrium: obeyed, stable (nobody switches), the same for every kind of crowd; herding stops once 50–90% use the app. In a large crowd **no correlated equilibrium beats Nash** (proved; confirmed by linear programming in all five facilities). | E1, E4 |
-| 4 | **Advice + reward** | The CE obedience constraints price the **smallest reward** that makes the optimum self-enforcing: every minute of reward saves 2.4–6.9 minutes, and **nobody is worse off** than under selfish timing. Jaiswal dinner: **2.24 → 0.36 min** per student. | E4, E7 |
-| 5 | **Bad days** | When the operator knows more than the crowd, *what* is said matters, not privacy: announcing a road accident **raises** the expected cost by 20%, a vague hint lowers it, and private (Bayes-correlated) advice adds at most 0.2%. | E5 |
+| 3 | **Private advice (CE)** | In small crowds the exact best correlated equilibrium **beats every Nash equilibrium** (60% of the Nash–planner gap at 10 people), and the advantage fades with size (about 2% at 51–60). In a large crowd no CE beats Nash (proved for separable costs; checked by linear programming on our queue). Shuffled advice from a Nash schedule is obeyed by rational users and stable, and stops herding once 50–90% use it; users who choose as noisily as everyone else drift off it, because a Nash schedule leaves them nearly indifferent. | E1, E4, E8 |
+| 4 | **Advice + reward** | The CE obedience constraints price the **smallest reward** that makes the optimum self-enforcing: every minute of reward saves 2.4–6.9 minutes, and **nobody is worse off** than under selfish timing. Jaiswal dinner: **2.24 → 0.36 min** per student. With noisy users the reward needs a 1–2 minute margin. | E4, E7 |
+| 5 | **Bad days** | When the operator knows more than the crowd, *what* is said matters most: announcing a road accident **raises** the expected cost by 20%, and on severe bad days announcing backfires clearly in 3 of 5 facilities (and barely in a fourth), while a calibrated hint never does worse. Private (Bayes-correlated) advice adds under 1% in the five facilities (over a 130-schedule menu), but up to 15% in small crowds and 6% even in a large 3-slot crowd on severe days. | E5, E8, E9 |
 | | **Learning** | Regret-matching learners who see every slot's wait end near the CE (= Nash) set; learners who see only their own wait keep large regret. | E1, E6 |
 | | **Mess data** | From scans alone we recover the serving rate (within 2–3% when a queue forms) and preferred times (97–100% within one slot), and forecast the next 30 minutes within 8–14%. | E7 |
 
@@ -49,6 +49,8 @@ All figures are produced by `python experiments.py`.
 | <img src="results/figures/fig5_uncertainty.png"> | <img src="results/figures/fig6_mess_data.png"> |
 | **E7** Jaiswal dinner, day by day | **E7** Who should see the display; delay and swing |
 | <img src="results/figures/fig7_mess_dinners.png"> | <img src="results/figures/fig8_mess_display.png"> |
+| **E8** Small crowds solved exactly | **E9** Random arrivals; how bad a bad day is |
+| <img src="results/figures/fig9_small_crowds.png"> | <img src="results/figures/fig10_robustness.png"> |
 
 ## Run it
 
@@ -57,8 +59,8 @@ git clone https://github.com/YashG1836/crowd-congestion.git && cd crowd-congesti
 python -m venv .venv && source .venv/bin/activate     # Python 3.10+
 pip install -r requirements.txt
 
-pytest -q                     # 58 checks
-python experiments.py         # E1-E7 -> results/ and docs/data.js (~13 min; --quick for 5 seeds)
+pytest -q                     # 72 checks
+python experiments.py         # E1-E10 -> results/, docs/data.js and report/generated/ (~30 min; --quick for 5 seeds)
 streamlit run app.py          # the interactive lab
 open docs/index.html          # the website, offline
 ```
@@ -72,12 +74,13 @@ crowd/            the library, one file per layer
   theory.py       small games: Nash and correlated equilibria (LPs), Pigou, learning (regret matching, Hedge)
   game.py         slot game: fluid queue, Nash / large-crowd (Wardrop) / optimum solvers, price of anarchy
   correlated.py   shuffled recommender, obedience, best-CE LPs, obedience reward, who gains, bad-day information design
+  smallcrowd.py   small crowds solved exactly: best CE vs pure and mixed Nash, private vs public advice on bad days
   simulate.py     day-to-day simulator: display policies, logit behaviour, Hedge / EXP3 / regret-matching learners
   domains.py      the same model for roads, networks, food courts, gyms and the mess
   mess.py         IITGN case study: scenario, synthetic QR-scan logs, calibration, forecasting
   viz.py          shared colours
 app.py            Streamlit lab (start here, small games, selfish vs planner, display, advice, mess, team)
-experiments.py    experiments E1-E7 -> results/ (figures + RESULTS.md) and docs/data.js
+experiments.py    experiments E1-E10 -> results/ (figures + RESULTS.md), docs/data.js and report/generated/ (numbers.tex, tables)
 docs/             the website (GitHub Pages): index.html, style.css, app.js, data.js, img/
 tests/            tests for every quoted claim
 report/           LaTeX report on the PRIMEarxiv template (main.tex/pdf); draft1/ = the earlier draft

@@ -161,6 +161,16 @@ class Recommend(Policy):
     rotate       True (default): a new shuffle every day, so inconvenient slots
                  rotate among similar people. False: the first day's assignment
                  is kept for ever (used to measure fairness).
+    noise        None (default): app users are rational as described above.
+                 A number lam: app users are boundedly rational instead. Told
+                 slot r, a type-k user picks slot t with probability proportional
+                 to exp(-lam * (dev_costs[k, r, t] - bonus[k, r] * [t == r])),
+                 i.e. the same logit choice everyone else uses, applied to the
+                 costs the app can compute if the others follow their advice.
+                 With noise, obeying is only the most likely choice, so the CE
+                 result is tested rather than assumed.
+    dev_costs    (K, T, T) cost of a type-k person told r who goes to t while
+                 everyone else obeys (SlotGame.deviation_costs of the target).
     """
 
     target: np.ndarray = None
@@ -174,12 +184,16 @@ class Recommend(Policy):
     fallback: Policy = field(default_factory=NoInfo)
     name: str = "pi7 CE recommendation"
     rotate: bool = True
+    noise: float | None = None
+    dev_costs: np.ndarray | None = None
 
     def setup(self, n, T, rng):
         super().setup(n, T, rng)
         self.fallback.setup(n, T, rng)
         self.users = rng.random(n) < self.compliance
         self._fixed = None
+        if self.noise is not None and self.dev_costs is None:
+            raise ValueError("noisy app users need dev_costs (the target's deviation costs)")
 
     def estimate(self, history, memory, rng):
         return self.fallback.estimate(history, memory, rng)
@@ -189,6 +203,13 @@ class Recommend(Policy):
             self._fixed = recommend(rng, self.type_of, self.target)
         rec = self._fixed
         follow = self.users.copy()
+        if self.noise is not None:
+            k = self.type_of
+            cost = self.dev_costs[k, rec, :].copy()  # (n, T): what each slot would cost me
+            if self.bonus is not None:
+                cost[np.arange(len(rec)), rec] -= self.bonus[k, rec]
+            score = -self.noise * cost + rng.gumbel(size=cost.shape)  # Gumbel-max = logit sampling
+            return np.where(follow, np.argmax(score, axis=1), rec), follow
         if self.rational and self.gains is not None:
             k = self.type_of
             net = self.gains - (self.bonus if self.bonus is not None else 0.0)
