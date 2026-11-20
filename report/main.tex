@@ -547,18 +547,35 @@ a lunch rush after classes (around 13:05) and a dinner rush around 20:10. On spe
 lunch, Wednesday and Sunday dinner) 5\% more students come, the counter runs at 80\% speed and everyone comes 10 minutes
 earlier. We simulate the status quo (no display; students choose by logit with memory) for eight weeks and write
 exactly what the mess office would have: a QR-scan log (date, meal, mess, menu, student id, scan time), where the scan
-time is the arrival time plus the exact queue wait. This gives \textbf{393,747 scans} (Fig.~\ref{fig:messdata} in Appendix~\ref{app:mess}).
+time is the arrival time plus the exact queue wait. This gives \textbf{393,747 scans} (Fig.~\ref{fig:messdata}, left).
 A hidden ground-truth table scores our estimates.
+
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig6_mess_data.png}
+\caption{Left: synthetic QR scans at the Jaiswal dinner, per 10 minutes and by weekday. The flat tops are the serving
+rate; Wednesday and Sunday have special menus. Right: cost per student at every meal under selfish timing and under
+the planner (average of the four messes).}\label{fig:messdata}\end{figure}
 
 \subsection{What the scans reveal}
 A scan happens when the plate is picked up, so waiting is not observed directly. Two facts are still easy to recover
-(Table~\ref{tab:data} in Appendix~\ref{app:mess}). \emph{The serving rate}: while a queue exists, plates leave at rate $\mu$, so the busiest
+(Table~\ref{tab:data}). \emph{The serving rate}: while a queue exists, plates leave at rate $\mu$, so the busiest
 five minutes of scans estimate $\mu$ within 2--3\%. When no queue ever forms (a normal breakfast) this is only a lower
 bound. \emph{Preferred times}: a student's median scan slot on normal days recovers their favourite slot exactly for
 80--100\% of students, and within one slot for 97--100\%. This is all that the advice app of Section~\ref{sec:rec}
 needs. Because the scans come from our own model, this shows that the estimators are consistent with it, not that they
 would work on real logs; that needs the pilot of Section~\ref{sec:limits}. A short-term forecast of the next 30 minutes is accurate to 3.4--4.6 scans per slot (8--14\% of the load),
 whether or not it is rescaled by tonight's first scans.
+
+\begin{table}[t]\centering\small
+\caption{Learning the unknowns from the scans alone. Serving rate: Jaiswal. Favourite slots: all 3000 students. Scans per
+slot and forecast error (scans per slot, next 30 minutes, the better of two forecasters): average of the four messes.}\label{tab:data}
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+Meal & true $\mu$ & estimated $\mu$ & favourite slot exact / within 1 & scans per slot & forecast error\\\midrule
+Breakfast, normal / special & 8.0 / 6.4 & 6.2$^{\dagger}$ / 6.6 & 99.6\% / 100\% & 27.7 / 30.9 & 3.4 / 3.6\\
+Lunch, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 91.3\% / 99.5\% & 39.5 / 41.6 & 4.0 / 3.4\\
+Dinner, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 79.5\% / 96.9\% & 41.5 / 43.0 & 4.4 / 3.6\\\bottomrule
+\multicolumn{6}{@{}l}{\footnotesize $^{\dagger}$No queue forms at a normal breakfast, so the scans give only a lower bound.}
+\end{tabular}
+\end{table}
 
 \subsection{Every meal as a game}
 Each mess, meal and menu is one game of Section~\ref{sec:model}, built from the roster (24 games). A normal dinner
@@ -567,7 +584,7 @@ breakfast has no queue at all. Over the four messes and three meals of a normal 
 student-hours lost every day} with the fluid queue, and \HoursRandom{} when arrival times are random (Section~\ref{sec:selfish}).
 
 \subsection{The Jaiswal dinner, day by day}
-Figure~\ref{fig:dinners} (Appendix~\ref{app:mess}) replays 40 dinners of a reactive crowd, and Table~\ref{tab:jaiswal} (Appendix~\ref{app:mess}) compares every display
+Figure~\ref{fig:dinners} replays 40 dinners of a reactive crowd, and Table~\ref{tab:jaiswal} compares every display
 we considered. A public display of yesterday's queue raises the cost from 2.24 (Nash) to 11.55 minutes, and three
 in four students change slot every evening. Making the display older (11.50) or coarser, as Low/Medium/High (12.95),
 does not help, and private noise helps only partly (6.94): anything that everyone reacts to in the same way herds.
@@ -577,6 +594,28 @@ yesterday's numbers to 11\% with numbers four dinners old (Fig.~\ref{fig:messdis
 reaction overshoot. With rational students CE advice gives 2.24 minutes in every crowd with no swing at all, and with the obedience
 reward the cost falls to \textbf{0.36} minutes, the planner's value (casual students need the margin of
 Section~\ref{sec:reward}).
+
+\begin{figure}[t]\centering\includegraphics[width=\linewidth]{fig7_mess_dinners.png}
+\caption{Jaiswal dinner with a reactive crowd, dinners 51--90. Top: arrivals divided by the counter's capacity (red =
+overload). Bottom: cost per student. The public display makes the rush jump around every evening; CE advice keeps a
+steady schedule.}\label{fig:dinners}\end{figure}
+
+\begin{table}[t]\centering\small
+\caption{Every display policy at the Jaiswal dinner (minutes per student, 30 seeds; Nash 2.24, planner 0.36).}\label{tab:jaiswal}
+\begin{tabular}{@{}lrrr|lrrr@{}}\toprule
+Policy & calm & reactive & noisy & Policy & calm & reactive & noisy\\\midrule
+No information & 1.65 & 2.11 & 1.84 & Display for 30\% of students & 2.02 & 2.10 & 1.89\\
+Public display (yesterday) & 2.12 & \textcolor{cNE}{11.55} & 1.84 & Moving-average forecast & 2.17 & 2.20 & 1.88\\
+Display, 3 dinners old & 4.07 & \textcolor{cNE}{11.50} & 2.73 & CE advice & 2.24 & 2.24 & 2.24\\
+Display + private noise & 2.60 & \textcolor{cNE}{6.94} & 2.51 & Optimum as advice (no reward) & 3.61 & 3.61 & 3.61\\
+Display in 3 levels & 3.83 & \textcolor{cNE}{12.95} & 3.34 & CE advice + reward & \textbf{0.36} & \textbf{0.36} & \textbf{0.36}\\\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]\centering\includegraphics[width=0.92\linewidth]{fig8_mess_display.png}
+\caption{Showing information at the mess. Left: a reactive crowd when only a share of students see the display.
+Right: the share of students who change slot every day, by display delay and by the share who reconsider each
+day.}\label{fig:messdisplay}\end{figure}
 
 \subsection{Who gains, and what to say on short-staffed days}
 Coordination asks the flexible students to move, so it is fair to ask who pays. Under selfish timing students lose
@@ -705,47 +744,5 @@ semester, and the manual queue-timing study by the generator's ground-truth wait
 \bibitem{holm} S.~Holm. A simple sequentially rejective multiple test procedure. \emph{Scand.\ J.\ Statist.}, 6(2):65--70, 1979.
 \bibitem{bergemann} D.~Bergemann, S.~Morris. Bayes correlated equilibrium and the comparison of information structures in games. \emph{Theoretical Economics}, 11(2):487--522, 2016.
 \end{thebibliography}
-
-\clearpage
-\appendix
-\section{Additional mess results}\label{app:mess}
-\begin{table}[h]\centering\small
-\caption{Learning the unknowns from the scans alone. Serving rate: Jaiswal. Favourite slots: all 3000 students. Scans per
-slot and forecast error (scans per slot, next 30 minutes, the better of two forecasters): average of the four messes.}\label{tab:data}
-\begin{tabular}{@{}lrrrrr@{}}\toprule
-Meal & true $\mu$ & estimated $\mu$ & favourite slot exact / within 1 & scans per slot & forecast error\\\midrule
-Breakfast, normal / special & 8.0 / 6.4 & 6.2$^{\dagger}$ / 6.6 & 99.6\% / 100\% & 27.7 / 30.9 & 3.4 / 3.6\\
-Lunch, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 91.3\% / 99.5\% & 39.5 / 41.6 & 4.0 / 3.4\\
-Dinner, normal / special & 9.0 / 7.2 & 9.2 / 7.4 & 79.5\% / 96.9\% & 41.5 / 43.0 & 4.4 / 3.6\\\bottomrule
-\multicolumn{6}{@{}l}{\footnotesize $^{\dagger}$No queue forms at a normal breakfast, so the scans give only a lower bound.}
-\end{tabular}
-\end{table}
-
-\begin{figure}[h]\centering\includegraphics[width=\linewidth]{fig7_mess_dinners.png}
-\caption{Jaiswal dinner with a reactive crowd, dinners 51--90. Top: arrivals divided by the counter's capacity (red =
-overload). Bottom: cost per student. The public display makes the rush jump around every evening; CE advice keeps a
-steady schedule.}\label{fig:dinners}\end{figure}
-
-\begin{figure}[h]\centering\includegraphics[width=\linewidth]{fig6_mess_data.png}
-\caption{Left: synthetic QR scans at the Jaiswal dinner, per 10 minutes and by weekday. The flat tops are the serving
-rate; Wednesday and Sunday have special menus. Right: cost per student at every meal under selfish timing and under
-the planner (average of the four messes).}\label{fig:messdata}\end{figure}
-
-\begin{table}[h]\centering\small
-\caption{Every display policy at the Jaiswal dinner (minutes per student, 30 seeds; Nash 2.24, planner 0.36).}\label{tab:jaiswal}
-\begin{tabular}{@{}lrrr|lrrr@{}}\toprule
-Policy & calm & reactive & noisy & Policy & calm & reactive & noisy\\\midrule
-No information & 1.65 & 2.11 & 1.84 & Display for 30\% of students & 2.02 & 2.10 & 1.89\\
-Public display (yesterday) & 2.12 & \textcolor{cNE}{11.55} & 1.84 & Moving-average forecast & 2.17 & 2.20 & 1.88\\
-Display, 3 dinners old & 4.07 & \textcolor{cNE}{11.50} & 2.73 & CE advice & 2.24 & 2.24 & 2.24\\
-Display + private noise & 2.60 & \textcolor{cNE}{6.94} & 2.51 & Optimum as advice (no reward) & 3.61 & 3.61 & 3.61\\
-Display in 3 levels & 3.83 & \textcolor{cNE}{12.95} & 3.34 & CE advice + reward & \textbf{0.36} & \textbf{0.36} & \textbf{0.36}\\\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[h]\centering\includegraphics[width=0.92\linewidth]{fig8_mess_display.png}
-\caption{Showing information at the mess. Left: a reactive crowd when only a share of students see the display.
-Right: the share of students who change slot every day, by display delay and by the share who reconsider each
-day.}\label{fig:messdisplay}\end{figure}
 
 \end{document}
